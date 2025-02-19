@@ -40,7 +40,7 @@ export const getTaskById = async (taskId, userId) => {
  */
 export const updateTask = async (taskId, userId, taskData) => {
     console.log("i am updatecontroller");
-    const task = await Task.findOne({ userId: userId, isDeleted: false });
+    const task = await Task.findOne({_id: taskId, userId: userId, isDeleted: false });
 
     if (!task) {
         throw new CustomError("Task not found", 404);

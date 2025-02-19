@@ -1,5 +1,5 @@
 "use client";
-import { useState, createContext, useContext } from "react";
+import { useState, createContext, useContext, useEffect } from "react";
 import axios from "axios";
 
 const TaskContext = createContext();
@@ -8,6 +8,32 @@ export const TaskProvider = ({ children }) => {
     const statuses = ["pending", "inProgress", "completed"];
     const [openStatus, setOpenStatus] = useState("pending");
     const [tasks, setTasks] = useState([]);
+
+    useEffect(() => {
+        fetchTasks();
+
+        // Set up WebSocket connection
+        const socket = new WebSocket("ws://localhost:4200");
+        socket.onopen = () => console.log("WebSocket connected ✅");
+        socket.onclose = () => console.warn("WebSocket disconnected ❌, trying to reconnect...");
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log("WebSocket message received:", message);
+            if (message.type === "TASK_CREATED") {
+                setTasks((prev) => [...prev, message.task]);
+            } else if (message.type === "TASK_UPDATED") {
+                //pending not update in backend
+                setTasks((prev) => prev.map((task) => (task._id === message.task._id ? message.task : task)));
+            } else if (message.type === "TASK_DELETED") {
+                setTasks((prev) => prev.filter((task) => task._id !== message.taskId));
+            }else if(message.type=='TASK_DRAGGED'){
+                setTasks(message.soacketTask)
+            }
+        };
+
+        return () => socket.close();
+    }, []);
 
     /**
      * fetching all tasks
@@ -105,7 +131,7 @@ export const TaskProvider = ({ children }) => {
 
             await axios.patch(
                 `http://localhost:4200/api/tasks/drag-update`,
-                { tasks: updatedTasks },
+                { tasks: updatedTasks,soacketTask:taskss },
                 { withCredentials: true }
             );
         } catch (error) {
