@@ -126,6 +126,7 @@ export const TaskProvider = ({ children }) => {
                 setOpenStatus,
                 setTasks,
                 updateDrag,
+                statuses,
             }}
         >
             {children}

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { DesktopTaskForm } from "@/components/DesktopTaskForm";
+import { DesktopTaskForm } from "@/components/Desktop/DesktopTaskForm";
 import { useTasks } from "@/context/taskContext";
 import DesktopTaskCard from "./DesktopTaskCard";
 import DesktopEditModal from "./DesktopEditModal";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const DesktopKanban = ({  newTask, setNewTask, statuses }) => {
+const DesktopKanban = () => {
 
-    const { fetchTasks, setTasks, updateDrag, tasks } = useTasks();
+    const { fetchTasks, setTasks, updateDrag, tasks,statuses } = useTasks();
     const [editTask, setEditTask] = useState(null);
 
     useEffect(() => {
@@ -16,12 +16,10 @@ const DesktopKanban = ({  newTask, setNewTask, statuses }) => {
     }, []);
 
     const handleDragEnd = (result) => {
-        console.log(tasks, "log");
         const completed = tasks.filter((x) => x.status == "completed");
         const inProgress = tasks.filter((x) => x.status == "inProgress");
         const pending = tasks.filter((x) => x.status == "pending");
         const taskss = { pending, inProgress, completed };
-        console.log(taskss);
 
         const { destination, source } = result;
         if (!destination) return;
